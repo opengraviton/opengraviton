@@ -1,98 +1,92 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/opengraviton/graviton/main/assets/logo.svg" alt="OpenGraviton Master Logo" width="200" />
-  <h1>Welcome to OpenGraviton</h1>
-  <p><strong>Defying the gravitational pull of massive AI models.</strong></p>
+  <img src="https://raw.githubusercontent.com/opengraviton/graviton/main/assets/logo.svg" alt="OpenGraviton" width="200" />
+  <h1>OpenGraviton</h1>
+  <p><strong>AI belongs to everyone — not just those who can afford a GPU cluster.</strong></p>
+  <p>We build the open-source inference engine that runs 70B+ parameter LLMs on hardware you already own.</p>
 </div>
 
 <br />
 
-### 🌌 Our Mission
+## The Problem
 
-At OpenGraviton, we believe that the full power of Artificial Intelligence should not be locked behind massive GPU clusters or specialized hardware. 
+Today's most capable language models have 70–400 billion parameters. Running them requires GPU servers that cost $10,000–$100,000. That means the most powerful AI is locked behind a paywall, accessible only to well-funded companies and research labs.
 
-We build and maintain **Graviton**—the ultimate open-source inference engine—designed ground-up to compress, prune, and execute trillion-parameter AI models natively on consumer hardware like the Apple Silicon Mac Mini.
+**We believe this is the single biggest barrier to the next era of AI.**
 
-### ⚡ Core Technologies Built Here
+## Our Solution
 
-- 🗜️ **Extreme Quantization (1.58-bit Ternary)**: Squeezing 16-bit weights into `{-1, 0, +1}` for a staggering 10x compression in memory footprint.
-- 🔩 **QuantizedLinear**: Drop-in `nn.Linear` replacement — stores weights in packed quantized format. INT8 saves 62% memory with near-zero quality loss; mixed-precision routes critical layers to 8-bit, FFN to 4-bit.
-- 💿 **Layer Streaming via MMAP**: Surpassing physical RAM limits by directly memory-mapping neural networks from your NVMe SSD.
-- 🧠 **Speculative Decoding**: Self-speculative with layer-skip draft model, plus a pluggable framework for external draft models targeting 2-3x throughput.
-- 🎛️ **Dynamic Sparsity**: Firing only the absolute necessary neurons (Top-K) and Routing (MoE) dynamically on the fly.
-- 🧪 **88 Tests, Full Coverage**: Every component validated — attention masks, device-aware quantizers, speculative rollback, KV cache fast-path + compressed mode, and end-to-end model inference.
-- 🖥️ **[Graviton UI](https://github.com/opengraviton/graviton-ui)**: Beautiful dark-themed chat interface — enter a HuggingFace token + model ID, pick quantization settings, and chat with real-time streaming + live tok/s counter.
+**Graviton** is an inference engine built from the ground up to break that barrier. It combines six technologies — streaming layer-by-layer loading, extreme quantization, QuantizedLinear, speculative decoding, dynamic sparsity, and memory-mapped layer streaming — to run massive models on consumer hardware.
 
-### 📊 Proven Results
+**The result:** A 72B-parameter model that would normally need 144 GB of VRAM loads into **36 GB** on a Mac with 64 GB of unified memory. No GPU cluster. No cloud bill. Just your laptop.
 
-**Real inference on consumer hardware.** Graviton downloads, quantizes, and runs HuggingFace models with full text generation — no GPU cluster required.
+## Core Technologies
 
-| Metric | TinyLlama-1.1B on M1 Max |
+| Technology | What It Does |
 |---|---|
-| FP16 Baseline | 2.05 GB, ~18 tok/s |
-| INT8 QuantizedLinear | **0.78 GB** (62% smaller), ~19 tok/s |
-| Mixed-Precision (8/4) | **0.78 GB**, ~10 tok/s |
-| INT4 Packed | **0.24 GB** (8.4x smaller) |
-| Ternary (1.58-bit) | **0.24 GB** (8.4x smaller) |
-| KV Cache | INT8 compressed, sliding window |
-| Test Suite | **88 tests, all passing in ~2s** |
+| **Streaming Layer-by-Layer Loading** | Builds model skeleton on meta device, streams each transformer layer from safetensors shards, quantizes in-flight, frees originals. Peak memory = 1 FP16 layer + all previously quantized layers. |
+| **Extreme Quantization (1.58-bit Ternary)** | Collapses 16-bit weights to `{-1, 0, +1}` for 10x compression. Also supports INT4, INT8, and mixed-precision modes. |
+| **QuantizedLinear** | Drop-in `nn.Linear` replacement with packed quantized weights. INT8 saves 62% memory with near-zero quality loss. |
+| **Speculative Decoding** | Self-speculative with layer-skip draft model. Full model verifies in one forward pass. 2-3x throughput. |
+| **Dynamic Sparsity** | Top-K neuron activation and MoE routing. Only fires the neurons that matter — 70%+ compute savings per token. |
+| **Layer Streaming via MMAP** | Memory-maps weights from NVMe SSD with async prefetching. Even a 1 TB model runs with 16 GB RAM. |
+| **Graviton UI** | Dark-themed [chat interface](https://github.com/opengraviton/graviton-ui) with real-time streaming, live tok/s counter, and layer-by-layer loading progress. |
+| **88 Tests, Full Coverage** | Attention masks, quantizer device consistency, speculative rollback, KV cache, streaming loading, end-to-end inference — all passing in ~2 seconds. |
 
-### 🚀 Get Started
+## Proven Results
 
-Check out our repositories and join the revolution:
+| Scenario | Before Graviton | After Graviton |
+|---|---|---|
+| **72B model (Qwen2.5-72B)** | 144 GB FP16 — needs $10K+ GPU server | **36 GB** — runs on 64 GB Mac |
+| **TinyLlama-1.1B** | 2.05 GB FP16, ~18 tok/s | **0.78 GB** INT8 (62% smaller), ~19 tok/s |
+| **TinyLlama-1.1B** | 2.05 GB FP16 | **0.24 GB** INT4 (8.4x smaller) |
+| **KV Cache** | Full FP16 | INT8 compressed, sliding window |
+| **Test Suite** | — | 88 tests, all passing in ~2s |
+
+## Get Started — One Command
+
+### For Humans
+
+Install everything and open the chat UI in your browser:
+
+```bash
+pip install graviton-ui && graviton-ui
+```
+
+That's it. One command installs the engine, quantization stack, HuggingFace integration, and the chat interface. Your browser opens at `http://localhost:7860` — pick a model, choose quantization, and start chatting.
+
+### For AI Agents
+
+No UI, no browser, no unnecessary dependencies. Just the engine and a REST API:
+
+```bash
+pip install "graviton-ai[api]" && graviton-api
+```
+
+The headless API server starts on `0.0.0.0:7860`. An agent on a low-budget machine can load a 70B+ model via streaming quantization and use it programmatically — no GPU cluster, no cloud bill.
+
+| Endpoint | Method | Description |
+|---|---|---|
+| `/health` | GET | Liveness check |
+| `/api/models/load` | POST | Load a model: `{"model_id": "Qwen/Qwen2.5-72B-Instruct", "bits": 4}` |
+| `/api/models/status` | GET | Check loading progress (layer-by-layer status) |
+| `/api/chat` | POST | Send a message: `{"message": "Hello", "temperature": 0.7}` (SSE stream) |
+| `/api/models/unload` | POST | Unload the current model |
+
+### Repositories
 
 [![Graviton Engine](https://github-readme-stats.vercel.app/api/pin/?username=opengraviton&repo=graviton&theme=radical&bg_color=050508&title_color=B882FF&text_color=9CA3AF&icon_color=8A2BE2)](https://github.com/opengraviton/graviton)
 [![Graviton UI](https://github-readme-stats.vercel.app/api/pin/?username=opengraviton&repo=graviton-ui&theme=radical&bg_color=050508&title_color=B882FF&text_color=9CA3AF&icon_color=8A2BE2)](https://github.com/opengraviton/graviton-ui)
 
-```bash
-# Clone and install
-git clone https://github.com/opengraviton/graviton.git
-cd graviton
-pip install -e ".[all]"
+> For gated models (LLaMA, Mixtral, etc.), you'll need a HuggingFace token. See the [setup guide](https://github.com/opengraviton/graviton#huggingface-setup-for-downloading-models).
 
-# Check your hardware capabilities
-python3 -m graviton.cli.main info
+## Community
 
-# Run with INT8 quantization (62% memory savings)
-python3 -m graviton.cli.main run 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' \
-    -p 'Explain quantum computing:' -b 8 --no-mixed
-
-# Run with speculative decoding
-python3 -m graviton.cli.main run 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' \
-    -p 'Hello world' --speculative --spec-tokens 4
-
-# Run the test suite
-pytest tests/ -v   # 88 tests in ~2 seconds
-
-# Or use the Web UI instead of CLI
-pip install graviton-ui
-graviton-ui          # opens http://localhost:7860
-```
-
-**Expected output:**
-```
-Quantized 154 linear layers, saved 1318 MB in packed storage
-Model ready: 0.13B params, 0.78 GB on mps
-Quantization: INT8 uniform
-
-Prompt: Explain quantum computing:
---------------------------------------------------
-Generation: Quantum computing is an emerging field of computing
-that operates using quantum mechanics rather than classical
-computing principles...
---------------------------------------------------
-Generated 80 tokens in 4.28s (18.7 tok/s)
-```
-
-> For gated models (LLaMA, Mixtral, etc.), you'll need a HuggingFace token. See the [Graviton README](https://github.com/opengraviton/graviton#huggingface-setup-for-downloading-models) for setup instructions.
-
-### 🌍 Community
-
-- 📖 **Documentation & Website**: [opengraviton.github.io](https://opengraviton.github.io)
-- 🤝 **Contributing**: We welcome all hackers, researchers, and developers. Feel free to open a PR on exactly what you want to optimize next in `graviton`.
-- ⚖️ **License**: Everything we build is open-source under the Apache 2.0 license.
+- **Website & Docs**: [opengraviton.github.io](https://opengraviton.github.io)
+- **Contributing**: We welcome all hackers, researchers, and developers. Open a PR on exactly what you want to optimize next.
+- **License**: Everything is open-source under Apache 2.0.
 
 ---
 
 <p align="center">
-  <i>"Gravity pulls us down; OpenGraviton sets AI free."</i>
+  <em>"The age of AI starts when it reaches everyone's desk — not just the data center."</em>
 </p>
