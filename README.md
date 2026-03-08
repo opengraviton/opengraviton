@@ -2,75 +2,65 @@
   <img src="https://raw.githubusercontent.com/opengraviton/graviton/main/assets/logo.svg" alt="OpenGraviton" width="200" />
   <h1>OpenGraviton</h1>
   <p><strong>AI belongs to everyone — not just those who can afford a GPU cluster.</strong></p>
-  <p>We build the open-source inference engine that runs 70B+ parameter LLMs on hardware you already own.</p>
+  <p>We build the open-source engine that runs powerful AI models on your own computer.</p>
 </div>
 
 <br />
 
 ## The Problem
 
-Today's most capable language models have 70–400 billion parameters. Running them requires GPU servers that cost $10,000–$100,000. That means the most powerful AI is locked behind a paywall, accessible only to well-funded companies and research labs.
+Today's best AI models have 70–400 billion parameters. Running them requires GPU servers that cost $10,000–$100,000. The most powerful AI is locked behind a paywall.
 
 **We believe this is the single biggest barrier to the next era of AI.**
 
 ## Our Solution
 
-**Graviton** is an inference engine built from the ground up to break that barrier. It combines six technologies — streaming layer-by-layer loading, extreme quantization, QuantizedLinear, speculative decoding, dynamic sparsity, and memory-mapped layer streaming — to run massive models on consumer hardware.
+**Graviton** runs the models that shouldn't fit on your hardware. A 72B model that needs 144 GB? Graviton compresses it to 36 GB and loads it piece by piece. No GPU server. No cloud bill. Just your laptop.
 
-**The result:** A 72B-parameter model that would normally need 144 GB of VRAM loads into **36 GB** on a Mac with 64 GB of unified memory. No GPU cluster. No cloud bill. Just your laptop.
+## What It Does
 
-## Core Technologies
-
-| Technology | What It Does |
+| Feature | What You Get |
 |---|---|
-| **Streaming Layer-by-Layer Loading** | Builds model skeleton on meta device, streams each transformer layer from safetensors shards, quantizes in-flight, frees originals. Peak memory = 1 FP16 layer + all previously quantized layers. |
-| **Extreme Quantization (1.58-bit Ternary)** | Collapses 16-bit weights to `{-1, 0, +1}` for 10x compression. Also supports INT4, INT8, and mixed-precision modes. |
-| **QuantizedLinear** | Drop-in `nn.Linear` replacement with packed quantized weights. INT8 saves 62% memory with near-zero quality loss. |
-| **Speculative Decoding** | Self-speculative with layer-skip draft model. Full model verifies in one forward pass. 2-3x throughput. |
-| **Dynamic Sparsity** | Top-K neuron activation and MoE routing. Only fires the neurons that matter — 70%+ compute savings per token. |
-| **Layer Streaming via MMAP** | Memory-maps weights from NVMe SSD with async prefetching. Even a 1 TB model runs with 16 GB RAM. |
-| **Graviton UI** | Dark-themed [chat interface](https://github.com/opengraviton/graviton-ui) with real-time streaming, live tok/s counter, and layer-by-layer loading progress. |
-| **88 Tests, Full Coverage** | Attention masks, quantizer device consistency, speculative rollback, KV cache, streaming loading, end-to-end inference — all passing in ~2 seconds. |
+| **Run 70B+ models on a laptop** | A 72B model compressed from 144 GB to 36 GB — runs on a Mac with 64 GB RAM |
+| **Shrink models up to 10x** | Compresses 16-bit models to 4-bit or even 1.58-bit, making them 4–10x smaller |
+| **Stream models that don't fit** | Loads one layer at a time from disk, compresses each, and keeps going — never needs full model in memory |
+| **Fast text generation** | Predicts multiple tokens at once and skips unnecessary computation — 2–3x faster output |
+| **Your data stays private** | Everything runs locally. No cloud. No API keys. No monthly bill |
+| **Built for AI agents too** | Headless REST API — agents on cheap hardware can use 70B+ models programmatically |
 
-## Proven Results
+## The Numbers
 
-| Scenario | Before Graviton | After Graviton |
+| Scenario | Without Graviton | With Graviton |
 |---|---|---|
-| **72B model (Qwen2.5-72B)** | 144 GB FP16 — needs $10K+ GPU server | **36 GB** — runs on 64 GB Mac |
-| **TinyLlama-1.1B** | 2.05 GB FP16, ~18 tok/s | **0.78 GB** INT8 (62% smaller), ~19 tok/s |
-| **TinyLlama-1.1B** | 2.05 GB FP16 | **0.24 GB** INT4 (8.4x smaller) |
-| **KV Cache** | Full FP16 | INT8 compressed, sliding window |
-| **Test Suite** | — | 88 tests, all passing in ~2s |
+| **Qwen2.5-72B** | 144 GB — needs $10K+ GPU server | **36 GB** — runs on 64 GB Mac |
+| **LLaMA-2-70B** | 140 GB — crashes | **35 GB** — fits on a laptop |
 
 ## Get Started — One Command
 
-### For Humans
-
-Install everything and open the chat UI in your browser:
+**For you** — install and start chatting:
 
 ```bash
 pip install graviton-ui && graviton-ui
 ```
 
-That's it. One command installs the engine, quantization stack, HuggingFace integration, and the chat interface. Your browser opens at `http://localhost:7860` — pick a model, choose quantization, and start chatting.
+Your browser opens. Pick a model. Start chatting. That's it.
 
-### For AI Agents
-
-No UI, no browser, no unnecessary dependencies. Just the engine and a REST API:
+**For AI agents** — headless API, no UI:
 
 ```bash
 pip install "graviton-ai[api]" && graviton-api
 ```
 
-The headless API server starts on `0.0.0.0:7860`. An agent on a low-budget machine can load a 70B+ model via streaming quantization and use it programmatically — no GPU cluster, no cloud bill.
+REST API on `0.0.0.0:7860`. Load models, send messages, get streaming responses.
 
-| Endpoint | Method | Description |
+| Endpoint | Method | What It Does |
 |---|---|---|
-| `/health` | GET | Liveness check |
+| `/health` | GET | Check if the server is running |
 | `/api/models/load` | POST | Load a model: `{"model_id": "Qwen/Qwen2.5-72B-Instruct", "bits": 4}` |
-| `/api/models/status` | GET | Check loading progress (layer-by-layer status) |
-| `/api/chat` | POST | Send a message: `{"message": "Hello", "temperature": 0.7}` (SSE stream) |
-| `/api/models/unload` | POST | Unload the current model |
+| `/api/models/status` | GET | Check loading progress |
+| `/api/chat` | POST | Send a message, get streaming response |
+| `/api/models/cancel` | POST | Cancel an in-progress load |
+| `/api/models/unload` | POST | Unload the model and free memory |
 
 ### Repositories
 
@@ -81,9 +71,9 @@ The headless API server starts on `0.0.0.0:7860`. An agent on a low-budget machi
 
 ## Community
 
-- **Website & Docs**: [opengraviton.github.io](https://opengraviton.github.io)
-- **Contributing**: We welcome all hackers, researchers, and developers. Open a PR on exactly what you want to optimize next.
-- **License**: Everything is open-source under Apache 2.0.
+- **Website**: [opengraviton.github.io](https://opengraviton.github.io)
+- **Contributing**: PRs welcome. Open a PR on exactly what you want to optimize next.
+- **License**: Apache 2.0.
 
 ---
 
