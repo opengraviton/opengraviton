@@ -19,7 +19,7 @@ We build and maintain **Graviton**—the ultimate open-source inference engine�
 - 💿 **Layer Streaming via MMAP**: Surpassing physical RAM limits by directly memory-mapping neural networks from your NVMe SSD.
 - 🧠 **Speculative Decoding**: Self-speculative with layer-skip draft model, plus a pluggable framework for external draft models targeting 2-3x throughput.
 - 🎛️ **Dynamic Sparsity**: Firing only the absolute necessary neurons (Top-K) and Routing (MoE) dynamically on the fly.
-- 🧪 **83 Tests, Full Coverage**: Every component validated — attention masks, device-aware quantizers, speculative rollback, KV cache snapshot/truncate, and end-to-end model inference.
+- 🧪 **88 Tests, Full Coverage**: Every component validated — attention masks, device-aware quantizers, speculative rollback, KV cache fast-path + compressed mode, and end-to-end model inference.
 
 ### 📊 Proven Results
 
@@ -33,7 +33,7 @@ We build and maintain **Graviton**—the ultimate open-source inference engine�
 | INT4 Packed | **0.24 GB** (8.4x smaller) |
 | Ternary (1.58-bit) | **0.24 GB** (8.4x smaller) |
 | KV Cache | INT8 compressed, sliding window |
-| Test Suite | **83 tests, all passing in ~1s** |
+| Test Suite | **88 tests, all passing in ~2s** |
 
 ### 🚀 Get Started
 
@@ -59,7 +59,7 @@ python3 -m graviton.cli.main run 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' \
     -p 'Hello world' --speculative --spec-tokens 4
 
 # Run the test suite
-pytest tests/ -v   # 83 tests in ~1 second
+pytest tests/ -v   # 88 tests in ~2 seconds
 ```
 
 **Expected output:**
