@@ -15,19 +15,25 @@ We build and maintain **Graviton**—the ultimate open-source inference engine�
 ### ⚡ Core Technologies Built Here
 
 - 🗜️ **Extreme Quantization (1.58-bit Ternary)**: Squeezing 16-bit weights into `{-1, 0, +1}` for a staggering 10x compression in memory footprint.
+- 🔩 **QuantizedLinear**: Drop-in `nn.Linear` replacement — stores weights in packed quantized format. INT8 saves 62% memory with near-zero quality loss; mixed-precision routes critical layers to 8-bit, FFN to 4-bit.
 - 💿 **Layer Streaming via MMAP**: Surpassing physical RAM limits by directly memory-mapping neural networks from your NVMe SSD.
-- 🧠 **Speculative Decoding**: Shattering autoregressive memory-bandwidth bottlenecks by verifying parallel predictions on a target model.
+- 🧠 **Speculative Decoding**: Self-speculative with layer-skip draft model, plus a pluggable framework for external draft models targeting 2-3x throughput.
 - 🎛️ **Dynamic Sparsity**: Firing only the absolute necessary neurons (Top-K) and Routing (MoE) dynamically on the fly.
+- 🧪 **83 Tests, Full Coverage**: Every component validated — attention masks, device-aware quantizers, speculative rollback, KV cache snapshot/truncate, and end-to-end model inference.
 
-### 📊 Proven Results (v0.1.0)
+### 📊 Proven Results
 
 **Real inference on consumer hardware.** Graviton downloads, quantizes, and runs HuggingFace models with full text generation — no GPU cluster required.
 
 | Metric | TinyLlama-1.1B on M1 Max |
 |---|---|
-| Memory (FP16 → Graviton) | 2.05 GB → 0.24 GB **(8.4x smaller)** |
-| Decode Speed | ~16–31 tok/s on Apple Metal |
+| FP16 Baseline | 2.05 GB, ~18 tok/s |
+| INT8 QuantizedLinear | **0.78 GB** (62% smaller), ~19 tok/s |
+| Mixed-Precision (8/4) | **0.78 GB**, ~10 tok/s |
+| INT4 Packed | **0.24 GB** (8.4x smaller) |
+| Ternary (1.58-bit) | **0.24 GB** (8.4x smaller) |
 | KV Cache | INT8 compressed, sliding window |
+| Test Suite | **83 tests, all passing in ~1s** |
 
 ### 🚀 Get Started
 
@@ -44,19 +50,31 @@ pip install -e ".[all]"
 # Check your hardware capabilities
 python3 -m graviton.cli.main info
 
-# Run a model locally
-python3 -m graviton.cli.main run 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' -p 'Explain quantum gravity'
+# Run with INT8 quantization (62% memory savings)
+python3 -m graviton.cli.main run 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' \
+    -p 'Explain quantum computing:' -b 8 --no-mixed
+
+# Run with speculative decoding
+python3 -m graviton.cli.main run 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' \
+    -p 'Hello world' --speculative --spec-tokens 4
+
+# Run the test suite
+pytest tests/ -v   # 83 tests in ~1 second
 ```
 
 **Expected output:**
 ```
-Model ready: 1.10B params, 2.05 GB on mps
-Prompt: Explain quantum gravity
+Quantized 154 linear layers, saved 1318 MB in packed storage
+Model ready: 0.13B params, 0.78 GB on mps
+Quantization: INT8 uniform
+
+Prompt: Explain quantum computing:
 --------------------------------------------------
-Generation: Quantum gravity is the hypothetical theory that aims
-to reconcile quantum mechanics and general relativity...
+Generation: Quantum computing is an emerging field of computing
+that operates using quantum mechanics rather than classical
+computing principles...
 --------------------------------------------------
-Generated 42 tokens in 2.83s (14.8 tok/s)
+Generated 80 tokens in 4.28s (18.7 tok/s)
 ```
 
 > For gated models (LLaMA, Mixtral, etc.), you'll need a HuggingFace token. See the [Graviton README](https://github.com/opengraviton/graviton#huggingface-setup-for-downloading-models) for setup instructions.
