@@ -30,11 +30,19 @@ Check out our flagship engine repository and join the revolution:
 [![Graviton Engine](https://github-readme-stats.vercel.app/api/pin/?username=opengraviton&repo=graviton&theme=radical&bg_color=050508&title_color=B882FF&text_color=9CA3AF&icon_color=8A2BE2)](https://github.com/opengraviton/graviton)
 
 ```bash
-# How to run locally today
+# Clone and install
 git clone https://github.com/opengraviton/graviton.git
 cd graviton
-python3 -m graviton.cli.main run "mixtral-8x22" -p "Explain quantum gravity"
+pip install -e ".[all]"
+
+# Check your hardware capabilities
+python3 -m graviton.cli.main info
+
+# Run a small open model to test
+python3 -m graviton.cli.main run "TinyLlama/TinyLlama-1.1B-Chat-v1.0" -p "Explain quantum gravity"
 ```
+
+> For gated models (LLaMA, Mixtral, etc.), you'll need a HuggingFace token. See the [Graviton README](https://github.com/opengraviton/graviton#huggingface-setup-for-downloading-models) for setup instructions.
 
 ### 🌍 Community
 
