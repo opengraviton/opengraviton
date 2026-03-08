@@ -20,6 +20,7 @@ We build and maintain **Graviton**—the ultimate open-source inference engine�
 - 🧠 **Speculative Decoding**: Self-speculative with layer-skip draft model, plus a pluggable framework for external draft models targeting 2-3x throughput.
 - 🎛️ **Dynamic Sparsity**: Firing only the absolute necessary neurons (Top-K) and Routing (MoE) dynamically on the fly.
 - 🧪 **88 Tests, Full Coverage**: Every component validated — attention masks, device-aware quantizers, speculative rollback, KV cache fast-path + compressed mode, and end-to-end model inference.
+- 🖥️ **[Graviton UI](https://github.com/opengraviton/graviton-ui)**: Beautiful dark-themed chat interface — enter a HuggingFace token + model ID, pick quantization settings, and chat with real-time streaming + live tok/s counter.
 
 ### 📊 Proven Results
 
@@ -37,9 +38,10 @@ We build and maintain **Graviton**—the ultimate open-source inference engine�
 
 ### 🚀 Get Started
 
-Check out our flagship engine repository and join the revolution:
+Check out our repositories and join the revolution:
 
 [![Graviton Engine](https://github-readme-stats.vercel.app/api/pin/?username=opengraviton&repo=graviton&theme=radical&bg_color=050508&title_color=B882FF&text_color=9CA3AF&icon_color=8A2BE2)](https://github.com/opengraviton/graviton)
+[![Graviton UI](https://github-readme-stats.vercel.app/api/pin/?username=opengraviton&repo=graviton-ui&theme=radical&bg_color=050508&title_color=B882FF&text_color=9CA3AF&icon_color=8A2BE2)](https://github.com/opengraviton/graviton-ui)
 
 ```bash
 # Clone and install
@@ -60,6 +62,10 @@ python3 -m graviton.cli.main run 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' \
 
 # Run the test suite
 pytest tests/ -v   # 88 tests in ~2 seconds
+
+# Or use the Web UI instead of CLI
+pip install graviton-ui
+graviton-ui          # opens http://localhost:7860
 ```
 
 **Expected output:**
