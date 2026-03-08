@@ -39,7 +39,7 @@ pip install -e ".[all]"
 python3 -m graviton.cli.main info
 
 # Run a small open model to test
-python3 -m graviton.cli.main run "TinyLlama/TinyLlama-1.1B-Chat-v1.0" -p "Explain quantum gravity"
+python3 -m graviton.cli.main run 'TinyLlama/TinyLlama-1.1B-Chat-v1.0' -p 'Explain quantum gravity'
 ```
 
 > For gated models (LLaMA, Mixtral, etc.), you'll need a HuggingFace token. See the [Graviton README](https://github.com/opengraviton/graviton#huggingface-setup-for-downloading-models) for setup instructions.
