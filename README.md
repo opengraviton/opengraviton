@@ -23,6 +23,7 @@ AI is being monopolized. The most capable models are locked behind cloud APIs, s
 | **2–3x faster generation** | Predicts multiple tokens at once, skips unnecessary computation |
 | **Your data, your machine** | No cloud. No API keys. No corporate surveillance. Everything local |
 | **Built for AI agents** | Headless REST API — agents on low-budget hardware can use 500B+ models programmatically |
+| **Graviton-Native** | Train BitNet & MoE from scratch — 350M in 66 MB, 500B on 32 GB RAM |
 
 ## The Numbers
 
@@ -62,6 +63,7 @@ REST API on `0.0.0.0:7860`. Load models, send messages, get streaming responses.
 
 [![Graviton Engine](https://github-readme-stats.vercel.app/api/pin/?username=opengraviton&repo=graviton&theme=radical&bg_color=050508&title_color=B882FF&text_color=9CA3AF&icon_color=8A2BE2)](https://github.com/opengraviton/graviton)
 [![Graviton UI](https://github-readme-stats.vercel.app/api/pin/?username=opengraviton&repo=graviton-ui&theme=radical&bg_color=050508&title_color=B882FF&text_color=9CA3AF&icon_color=8A2BE2)](https://github.com/opengraviton/graviton-ui)
+[![Graviton-Native](https://github-readme-stats.vercel.app/api/pin/?username=opengraviton&repo=graviton-native&theme=radical&bg_color=050508&title_color=B882FF&text_color=9CA3AF&icon_color=8A2BE2)](https://github.com/opengraviton/graviton-native)
 
 > For gated models (LLaMA, Mixtral, etc.), you'll need a HuggingFace token. See the [setup guide](https://github.com/opengraviton/graviton#huggingface-setup-for-downloading-models).
 
